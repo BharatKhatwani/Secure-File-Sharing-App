@@ -1,0 +1,45 @@
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Logs
+logs/
+*.log
+*.csv
+*.out
+*.pid
+*.gz
+
+# Environment variables
+.env
+.env.*  # In case you use multiple env files (like .env.dev, .env.prod)
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Dependency directories
+bower_components/
+
+# Build / generated files
+dist/
+build/
+coverage/
+
+# Optional
+*.tgz
+package-lock.json  # If you’re using yarn.lock instead (optional team decision)
+.pnpm-debug.log
+
+# Uploads / temporary files
+uploads/
+temp/
+tmp/
