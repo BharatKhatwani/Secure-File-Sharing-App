@@ -14,6 +14,11 @@ const fileSchema = new mongoose.Schema({
   maxDownload :  { type: Number, default: 0 },
   downloadCount : { type: Number, default: 0 },
   downloadId : { type: String, default: '' },
+  uuid: {
+    type: String,
+    required: true,
+    unique: true
+  },
 });
 
 // Create the File model

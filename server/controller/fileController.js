@@ -1,37 +1,60 @@
-const File = require('../models/File');
+const cloudinary = require('../config/cloudinary');
+const fs = require('fs');
+const File = require('../models/File'); // Your MongoDB schema
+const { v4: uuidv4 } = require('uuid'); // Fix: use require, not import
 
-// Handle file upload and metadata saving
-const uploadFile = async (req, res) => {
+const uploadFileToCloudinary = async (req, res) => {
   try {
-    // Check if the file is uploaded
-    if (!req.file) {
-      return res.status(400).json({ message: 'No file uploaded' });
-    }
+    const localPath = req.file.path;
 
+    // Upload to Cloudinary
+    const result = await cloudinary.uploader.upload(localPath, {
+      folder: 'secure-drop'
+    });
 
-    console.log(req.user.id)
-    // Store the file metadata in MongoDB
-    const fileData = new File({
-      filename: req.file.filename,
-      path: req.file.path,
-      mimetype: req.file.mimetype,
+    // Delete local file after upload
+    fs.unlinkSync(localPath);
+
+    const fileUUID = uuidv4(); // ✅ Generate UUID
+
+    // Save metadata in DB
+    const file = new File({
+      filename: req.file.originalname,
       size: req.file.size,
-      
-      userId: req.user.id,  // Assuming the user is authenticated
+      mimetype: req.file.mimetype,
+      userId: req.user.id, // assuming auth middleware
+      uploadDate: new Date(),
+      path: result.secure_url,
+      downloadId: result.public_id,
+      uuid: fileUUID // ✅ Store UUID
     });
 
-    // Save to MongoDB
-    await fileData.save();
+    await file.save();
 
-    // Respond with the file metadata
-    res.status(201).json({
-      message: 'File uploaded successfully',
-      file: fileData,
+    res.status(200).json({ 
+      message: 'Uploaded to Cloudinary',
+      url: result.secure_url,
+      uuid: fileUUID, // ✅ Return UUID so frontend can use download link
+      public_id: result.public_id 
     });
-  } catch (error) {
-    console.error('Upload error:', error);
-    res.status(500).json({ message: 'Server Error' });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Upload failed' });
   }
 };
 
-module.exports = { uploadFile };
+const downloadFile = async (req, res) => {
+  try {
+    const file = await File.findOne({ uuid: req.params.uuid });
+
+    if (!file) return res.status(404).json({ message: 'Link expired or file not found' });
+
+    return res.redirect(file.path); // for Cloudinary hosted files
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+module.exports = { uploadFileToCloudinary, downloadFile };
