@@ -30,7 +30,7 @@ const PORT = process.env.PORT || 5000;
 
 // Basic route for testing
 app.get('/', (req, res) => {
-  res.send('Hello World');
+  res.send('Server is running');
 });
 
 // Start the server only after connecting to the DB
