@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();  // Corrected router initialization
-const { signup, login } = require('../controller/authController');
+const { signup, login } = require('../../controller/authController');
 
 // POST /register route for user signup
 router.post('/register', signup);  // Passed the signup function here

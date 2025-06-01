@@ -11,7 +11,7 @@ const fileSchema = new mongoose.Schema({
   uploadDate: { type: Date, default: Date.now }, 
   expiryDate: { type: Date,  default: () => Date.now() + 24 * 60 * 60 * 1000  }, 
 
-  maxDownload :  { type: Number, default: 0 },
+  maxDownload :  { type: Number, default: 5 },
   downloadCount : { type: Number, default: 0 },
   downloadId : { type: String, default: '' },
   uuid: {
